@@ -20,22 +20,22 @@ const client = new Client({
 });
 
 //return meme if "meme" is sent
-const memeTime = {
-  hour: 16,
-  minute: 58,
-};
-const channelId = process.env.CHANNEL_ID;
-const MEME_COUNT = 1;
-const spamLimit = 5;
-
 client.on("messageCreate", async (msg) => {
   console.log(`Message received: ${msg.content}`);
 
   if (msg.content === "meme") {
     const meme = await getMeme(1);
-    msg.reply(meme.url);
+    msg.reply(meme.memes[0].url);
   }
 });
+
+const memeTime = {
+  hour: 3,
+  minute: 0,
+};
+const channelId = process.env.CHANNEL_ID;
+const MEME_COUNT = 7;
+const spamLimit = 45;
 
 //spam memes at 3:00am
 client.once("clientReady", () => {
