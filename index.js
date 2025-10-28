@@ -1,10 +1,11 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, AttachmentBuilder } = require("discord.js");
+const cron = require("node-cron");
 
 //meme api
-async function getMeme() {
+async function getMeme(memeCount = 1) {
   console.log("Fetching meme...");
-  const api = await fetch("https://meme-api.com/gimme");
+  const api = await fetch(`https://meme-api.com/gimme/${memeCount}`);
   const data = await api.json();
   console.log("Meme data: ", data);
   return data;
@@ -18,19 +19,44 @@ const client = new Client({
   ],
 });
 
-// connection to discord
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-});
+//return meme if "meme" is sent
+const memeTime = {
+  hour: 16,
+  minute: 45,
+};
+const channelId = process.env.CHANNEL_ID;
+const MEME_COUNT = 10;
 
-//return pong if "ping" is sent
 client.on("messageCreate", async (msg) => {
   console.log(`Message received: ${msg.content}`);
 
   if (msg.content === "meme") {
-    const meme = await getMeme();
+    const meme = await getMeme(1);
     msg.reply(meme.url);
   }
+});
+
+//spam memes at 3:00am
+client.once("clientReady", () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+  console.log("Current time: " + new Date().toLocaleTimeString());
+
+  cron.schedule(`${memeTime.minute} ${memeTime.hour} * * *`, async () => {
+    console.log("MEME'O'CLOCK...");
+
+    const channel = client.channels.cache.get(channelId);
+    const meme = await getMeme(MEME_COUNT);
+
+    if (channel) {
+      const memeUrls = meme.memes.map((meme) => meme.url);
+
+      await channel.send({
+        content: "@everyone",
+        files: memeUrls,
+      });
+      console.log("Meme's delivered successfully.");
+    }
+  });
 });
 
 //discord bot token
