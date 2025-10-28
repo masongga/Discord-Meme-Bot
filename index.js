@@ -27,7 +27,7 @@ client.on("ready", () => {
 client.on("messageCreate", async (msg) => {
   console.log(`Message received: ${msg.content}`);
 
-  if (msg.content === "ping") {
+  if (msg.content === "meme") {
     const meme = await getMeme();
     msg.reply(meme.url);
   }
