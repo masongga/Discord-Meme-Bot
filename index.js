@@ -22,10 +22,11 @@ const client = new Client({
 //return meme if "meme" is sent
 const memeTime = {
   hour: 16,
-  minute: 45,
+  minute: 58,
 };
 const channelId = process.env.CHANNEL_ID;
-const MEME_COUNT = 10;
+const MEME_COUNT = 1;
+const spamLimit = 5;
 
 client.on("messageCreate", async (msg) => {
   console.log(`Message received: ${msg.content}`);
@@ -45,17 +46,20 @@ client.once("clientReady", () => {
     console.log("MEME'O'CLOCK...");
 
     const channel = client.channels.cache.get(channelId);
-    const meme = await getMeme(MEME_COUNT);
 
-    if (channel) {
-      const memeUrls = meme.memes.map((meme) => meme.url);
+    for (let i = 0; i < spamLimit; i++) {
+      const meme = await getMeme(MEME_COUNT);
+      if (channel) {
+        const memeUrls = meme.memes.map((meme) => meme.url);
 
-      await channel.send({
-        content: "@everyone",
-        files: memeUrls,
-      });
-      console.log("Meme's delivered successfully.");
+        await channel.send({
+          content: "@everyone",
+          files: memeUrls,
+        });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 30000));
     }
+    console.log("Meme's delivered successfully.");
   });
 });
 
