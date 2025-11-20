@@ -16,7 +16,6 @@ Built with Node.js and Discord.js.
 
 ### 1. Clone the Repository
 https://github.com/masongga/Discord-Meme-Bot
-cd discord-meme-bot
 
 ---
 
